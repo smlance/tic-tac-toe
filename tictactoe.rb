@@ -55,15 +55,20 @@ class Board
   end
 
   def game_over?
-    result = false
     [:x, :o].each do |p|
-      if p == @squares[0][0] or p == @squares[0][1] or p == @squares[0][2]
-        result = true
+      if (p == @squares[0][0] or p == @squares[0][1] or p == @squares[0][2]) or
+          (p == @squares[1][0] or p == @squares[1][1] or p == @squares[1][2]) or
+          (p == @squares[2][0] or p == @squares[2][1] or p == @squares[2][2]) or
+          (p == @squares[0][0] or p == @squares[1][0] or p == @squares[2][0]) or
+          (p == @squares[0][1] or p == @squares[1][1] or p == @squares[2][1]) or
+          (p == @squares[0][2] or p == @squares[1][2] or p == @squares[2][2]) or
+          (p == @squares[0][0] or p == @squares[1][1] or p == @squares[2][2]) or
+          (p == @squares[0][2] or p == @squares[1][1] or p == @squares[2][0]) or
+        return true
       else
-        result = false
+        return false
       end
     end
-    result
   end
 end
 
