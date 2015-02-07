@@ -10,10 +10,10 @@ class Player
   end
 
   def strategy
-    if @player_type = :human
-
-    elsif @player_type = :computer
-
+    if @player_type == :human
+      return gets.chomp
+    # elsif @player_type == :computer
+    #   return
     end
   end
 
@@ -21,6 +21,12 @@ end
 
 class Pos
   attr_accessor :x, :y
+
+  def initialize(xy)
+    @x = xy[0]
+    @y = xy[1]
+  end
+
 end
 
 class Board
@@ -36,7 +42,7 @@ class Board
   end
 
   def valid_mode?(pos)
-    @squares[pos.x][pos.y] == '#'
+    ([pos.x, pos.y] & [1, 2, 3]).present? and @squares[pos.x][pos.y] == '#'
   end
 
   def print_squares
@@ -81,7 +87,7 @@ class Game
     puts
   end
 
-  def switch_turn
+  def switch_player
     @current = (@current == @player_1) ? @player_2 : @player_1
   end
 
@@ -89,28 +95,27 @@ class Game
     print_instructions
     @board.print_squares
 
-    while (input = gets.chomp) != 'q'
+    until @board.game_over?
+      move = Pos.new(@current.strategy)
+
+      until @board.valid_move?(move)
+        puts "Invalid move; try again."
+      end
+
+      @board.apply_move(move, @current)
+      switch_player
       @board.print_squares
-      over = @board.game_over?
-
-      if over == :x or over == :o
-        puts "Player #{over} won!" and return
-      elsif over == :tie
-        puts "The game is a tie." and return
-      elsif !over
-        move = Pos.new(input)
-        if @board.valid_move?(move)
-          @board.apply_move(move)
-        end
-
-        switch_turn
-      end # else: a bug occurred
-
-      # check that move is valid
-      #   if so, apply move and continue
-      #   if not, get input from player again
       puts "It's player #{@current.symbol}'s turn:"
     end
+
+    status = @board.game_over?
+
+    if status == :x or status == :o
+      puts "Player #{status} won!"
+    elsif status == :tie
+      puts "The game is a tie."
+    end
+    # TODO: add option to redo the game
   end
 
 end
