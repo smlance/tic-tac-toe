@@ -2,7 +2,19 @@
 
 class Player
 
-  def move(board, pos)
+  attr_accessor :player_type, :symbol
+
+  def initialize(pt, s)
+    @player_type = pt
+    @symbol = s
+  end
+
+  def strategy
+    if @player_type = :human
+
+    elsif @player_type = :computer
+
+    end
   end
 
 end
@@ -19,9 +31,12 @@ class Board
     @squares = s
   end
 
-  def update_pos
-    # We need to check that the pos is available before moving, and if it's not
-    # available, we need to return with an error
+  def apply_move(pos, player)
+    @squares[pos.x][pos.y] = '#'
+  end
+
+  def valid_mode?(pos)
+    @squares[pos.x][pos.y] == '#'
   end
 
   def print_squares
@@ -30,6 +45,16 @@ class Board
         print cell
       end
       puts
+    end
+  end
+
+  def game_over?
+    [:x, :o].each do |p|
+      if p == @squares[0][0] or p == @squares[0][1] or p == @squares[0][2]
+        true
+      else
+        false
+      end
     end
   end
 end
@@ -44,7 +69,7 @@ class Game
                         ['#', '#', '#']])
     @player_1 = Player.new(:x)
     @player_2 = Player.new(:o)
-    @turn = :x
+    @current = @player_1
   end
 
   def print_instructions
@@ -56,22 +81,35 @@ class Game
     puts
   end
 
+  def switch_turn
+    @current = (@current == @player_1) ? @player_2 : @player_1
+  end
+
   def run
+    print_instructions
     @board.print_squares
 
-
-    while gets.chomp != 'q'
+    while (input = gets.chomp) != 'q'
       @board.print_squares
-      if @board.game_over
-      end
-      # check whether game is over
-      #   if so, end game and print winnter
-      #   if not, continue
+      over = @board.game_over?
 
-      # get input from player
+      if over == :x or over == :o
+        puts "Player #{over} won!" and return
+      elsif over == :tie
+        puts "The game is a tie." and return
+      elsif !over
+        move = Pos.new(input)
+        if @board.valid_move?(move)
+          @board.apply_move(move)
+        end
+
+        switch_turn
+      end # else: a bug occurred
+
       # check that move is valid
       #   if so, apply move and continue
       #   if not, get input from player again
+      puts "It's player #{@current.symbol}'s turn:"
     end
   end
 
