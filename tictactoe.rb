@@ -1,5 +1,6 @@
 # Tic Tac Toe
 # Stefan Lance (smlance)
+# February 2015
 
 class Player
 
@@ -14,6 +15,7 @@ class Player
     if @player_type == :human
       move = gets.chomp
       exit if move == 'q' # TODO: Add a "really?" prompt
+      return nil if move.length != 2 # TODO: Neater error-checking?
       return move
     # elsif @player_type == :computer
     #   return
@@ -29,8 +31,8 @@ class Pos
   attr_accessor :x, :y
 
   def initialize(xy)
-    @x = xy[0].to_i
-    @y = xy[1].to_i
+    @x = xy[0].ord - '0'.ord
+    @y = xy[1].ord - '0'.ord
   end
 
 end
@@ -50,16 +52,20 @@ class Board
   end
 
   def valid_move?(pos)
-    ([pos.x, pos.y] & [0, 1, 2]).any? and @squares[pos.x][pos.y] == '#'
+
+    return false unless pos
+
+    a = [0, 1, 2]
+    if a.include? pos.x and a.include? pos.y and @squares[pos.x][pos.y] == '#'
+      return true
+    else
+      return false
+    end
+
   end
 
   def print_squares
-    @squares.each do |row|
-      row.each do |cell|
-        print cell
-      end
-      puts
-    end
+    @squares.each { |r| r.each { |c| print c }; puts }
   end
 
 end
@@ -115,9 +121,10 @@ class Game
 
   def run
     print_instructions
-    @board.print_squares
 
     until game_over?
+      @board.print_squares
+      puts "It's player #{@current.symbol}'s turn:"
       move = Pos.new(@current.strategy)
 
       until @board.valid_move?(move)
@@ -127,8 +134,6 @@ class Game
 
       @board.apply_move(move, @current)
       switch_player
-      @board.print_squares
-      puts "It's player #{@current.symbol}'s turn:"
     end
 
     status = game_over?
@@ -167,3 +172,6 @@ def loop
 end
 
 loop
+
+# TODO: Ensure bogus human input / positions are appropriately dealt with and
+# don't crash the program
