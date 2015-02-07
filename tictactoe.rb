@@ -13,10 +13,18 @@ class Player
 
   def strategy
     if @player_type == :human
+      # We also check for input errors here
+      move = ''
       move = gets.chomp
+
+      until (move.length == 2 and move.tr("012", "") == "") or move == 'q'
+        puts "Invalid input: must be two digits long, between 0 and 2."
+        move = gets.chomp
+      end
+
       exit if move == 'q' # TODO: Add a "really?" prompt
-      return nil if move.length != 2 # TODO: Neater error-checking?
-      return move
+
+      return move.split("").map(&:to_i)
     # elsif @player_type == :computer
     #   return
     end
@@ -30,9 +38,9 @@ class Pos
 
   attr_accessor :x, :y
 
-  def initialize(xy)
-    @x = xy[0].ord - '0'.ord
-    @y = xy[1].ord - '0'.ord
+  def initialize(x, y) # Expects two integers
+    @x = x
+    @y = y
   end
 
 end
@@ -74,7 +82,7 @@ end
 
 class Game
 
-  attr_accessor :board, :player_1, :player_2, :current
+  attr_accessor :board, :player_1, :player_2, :current, :game_type
 
   def initialize(game_type)
     @board = Board.new([['#', '#', '#'],
@@ -83,15 +91,7 @@ class Game
     @player_1 = Player.new(:human, :x) # choose player_type by game_type
     @player_2 = Player.new(:human, :o) # choose player_type by game_type
     @current = @player_1
-  end
-
-  def print_instructions
-    puts "Tic Tac Toe"
-    puts "Instructions:"
-    puts "- enter two digits between 0 and 2 (e.g., `12`), where the first is"
-    puts "  the column and the second is the row"
-    puts "- enter `q` to quit"
-    puts
+    @game_type = game_type
   end
 
   def switch_player
@@ -104,38 +104,39 @@ class Game
     return :tie if squares.flatten.join.tr('xo', '') == ''
 
     # could use a loop: loop through cols, then rows; then check diags
-    s = @current.symbol
-    if (s == squares[0][0] && s == squares[0][1] && s == squares[0][2]) or
-        (s == squares[1][0] && s == squares[1][1] && s == squares[1][2]) or
-        (s == squares[2][0] && s == squares[2][1] && s == squares[2][2]) or
-        (s == squares[0][0] && s == squares[1][0] && s == squares[2][0]) or
-        (s == squares[0][1] && s == squares[1][1] && s == squares[2][1]) or
-        (s == squares[0][2] && s == squares[1][2] && s == squares[2][2]) or
-        (s == squares[0][0] && s == squares[1][1] && s == squares[2][2]) or
-        (s == squares[0][2] && s == squares[1][1] && s == squares[2][0])
-      return s
+    [@player_1.symbol, @player_2.symbol].each do |s|
+      if (s == squares[0][0] && s == squares[0][1] && s == squares[0][2]) or
+          (s == squares[1][0] && s == squares[1][1] && s == squares[1][2]) or
+          (s == squares[2][0] && s == squares[2][1] && s == squares[2][2]) or
+          (s == squares[0][0] && s == squares[1][0] && s == squares[2][0]) or
+          (s == squares[0][1] && s == squares[1][1] && s == squares[2][1]) or
+          (s == squares[0][2] && s == squares[1][2] && s == squares[2][2]) or
+          (s == squares[0][0] && s == squares[1][1] && s == squares[2][2]) or
+          (s == squares[0][2] && s == squares[1][1] && s == squares[2][0])
+        return s
+      end
     end
-
     false
   end
 
   def run
-    print_instructions
 
     until game_over?
+      puts
       @board.print_squares
       puts "It's player #{@current.symbol}'s turn:"
-      move = Pos.new(@current.strategy)
+      move = Pos.new(*@current.strategy)
 
       until @board.valid_move?(move)
         puts "Invalid move; try again."
-        move = Pos.new(@current.strategy)
+        move = Pos.new(*@current.strategy)
       end
 
       @board.apply_move(move, @current)
       switch_player
     end
 
+    @board.print_squares
     status = game_over?
 
     if status == :x or status == :o
@@ -144,15 +145,29 @@ class Game
       puts "The game is a tie."
     end
 
+    puts
   end
 
+end
+
+
+
+def print_instructions
+  puts "Tic Tac Toe"
+  puts "Instructions:"
+  puts "- enter two digits between 0 and 2 (e.g., `12`), where the first is"
+  puts "  the column and the second is the row"
+  puts "- enter `q` to quit"
+  puts
 end
 
 def loop
 
   restart = ''
+
   until restart == 'n'
-    # TODO: Add the ability to input a game type when beginning a game
+    restart = ''
+    # TODO: Let the user input a game type when beginning a game
     game = Game.new(:human_vs_human)
     game.run
 
@@ -164,14 +179,12 @@ def loop
       when 'y'
         next
       when 'n'
-        return
+        return # Exit the program
       end
     end
   end
 
 end
 
+print_instructions
 loop
-
-# TODO: Ensure bogus human input / positions are appropriately dealt with and
-# don't crash the program
