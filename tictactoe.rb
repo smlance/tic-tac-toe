@@ -55,21 +55,26 @@ class Board
   end
 
   def game_over?
+
+    puts @squares.flatten.join.tr('xo', '')
+
+    return :tie if @squares.flatten.join.tr('xo', '') == ''
+
     [:x, :o].each do |p|
-      if (p == @squares[0][0] or p == @squares[0][1] or p == @squares[0][2]) or
-          (p == @squares[1][0] or p == @squares[1][1] or p == @squares[1][2]) or
-          (p == @squares[2][0] or p == @squares[2][1] or p == @squares[2][2]) or
-          (p == @squares[0][0] or p == @squares[1][0] or p == @squares[2][0]) or
-          (p == @squares[0][1] or p == @squares[1][1] or p == @squares[2][1]) or
-          (p == @squares[0][2] or p == @squares[1][2] or p == @squares[2][2]) or
-          (p == @squares[0][0] or p == @squares[1][1] or p == @squares[2][2]) or
-          (p == @squares[0][2] or p == @squares[1][1] or p == @squares[2][0]) or
-        return true
-      else
-        return false
+      if (p == @squares[0][0] and p == @squares[0][1] and p == @squares[0][2]) or
+          (p == @squares[1][0] and p == @squares[1][1] and p == @squares[1][2]) or
+          (p == @squares[2][0] and p == @squares[2][1] and p == @squares[2][2]) or
+          (p == @squares[0][0] and p == @squares[1][0] and p == @squares[2][0]) or
+          (p == @squares[0][1] and p == @squares[1][1] and p == @squares[2][1]) or
+          (p == @squares[0][2] and p == @squares[1][2] and p == @squares[2][2]) or
+          (p == @squares[0][0] and p == @squares[1][1] and p == @squares[2][2]) or
+          (p == @squares[0][2] and p == @squares[1][1] and p == @squares[2][0])
+        return p.to_sym
       end
     end
+    false
   end
+
 end
 
 class Game
