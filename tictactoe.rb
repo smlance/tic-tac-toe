@@ -19,7 +19,10 @@ class Player
 
 end
 
+
+
 class Pos
+
   attr_accessor :x, :y
 
   def initialize(xy)
@@ -28,6 +31,8 @@ class Pos
   end
 
 end
+
+
 
 class Board
 
@@ -55,6 +60,8 @@ class Board
   end
 
 end
+
+
 
 class Game
 
@@ -110,6 +117,8 @@ class Game
     until @board.game_over?
       move = Pos.new(@current.strategy)
 
+      return if move == 'q'
+
       until @board.valid_move?(move)
         puts "Invalid move; try again."
         move = Pos.new(@current.strategy)
@@ -128,10 +137,32 @@ class Game
     elsif status == :tie
       puts "The game is a tie."
     end
-    # TODO: add option to restart the game
+
   end
 
 end
 
-game = Game.new(:human_vs_human)
-game.run
+def loop
+
+  restart = ''
+  until restart == 'n'
+    # TODO: Add the ability to input a game type when beginning a game
+    game = Game.new(:human_vs_human)
+    game.run
+
+    until restart == 'y'
+      puts "Would you like to play again? [yn]"
+      restart = gets.chomp
+
+      case restart
+      when 'y'
+        next
+      when 'n'
+        return
+      end
+    end
+  end
+
+end
+
+loop
