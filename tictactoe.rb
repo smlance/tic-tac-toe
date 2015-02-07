@@ -54,27 +54,6 @@ class Board
     end
   end
 
-  def game_over?
-
-    puts @squares.flatten.join.tr('xo', '')
-
-    return :tie if @squares.flatten.join.tr('xo', '') == ''
-
-    [:x, :o].each do |p|
-      if (p == @squares[0][0] and p == @squares[0][1] and p == @squares[0][2]) or
-          (p == @squares[1][0] and p == @squares[1][1] and p == @squares[1][2]) or
-          (p == @squares[2][0] and p == @squares[2][1] and p == @squares[2][2]) or
-          (p == @squares[0][0] and p == @squares[1][0] and p == @squares[2][0]) or
-          (p == @squares[0][1] and p == @squares[1][1] and p == @squares[2][1]) or
-          (p == @squares[0][2] and p == @squares[1][2] and p == @squares[2][2]) or
-          (p == @squares[0][0] and p == @squares[1][1] and p == @squares[2][2]) or
-          (p == @squares[0][2] and p == @squares[1][1] and p == @squares[2][0])
-        return p.to_sym
-      end
-    end
-    false
-  end
-
 end
 
 class Game
@@ -101,6 +80,27 @@ class Game
 
   def switch_player
     @current = (@current == @player_1) ? @player_2 : @player_1
+  end
+
+  def game_over?
+
+    squares = @board.squares
+    return :tie if squares.flatten.join.tr('xo', '') == ''
+
+    # could use a loop: loop through cols, then rows; then check diags
+    s = @current.symbol
+    if (s == squares[0][0] && s == squares[0][1] && s == squares[0][2]) or
+        (s == squares[1][0] && s == squares[1][1] && s == squares[1][2]) or
+        (s == squares[2][0] && s == squares[2][1] && s == squares[2][2]) or
+        (s == squares[0][0] && s == squares[1][0] && s == squares[2][0]) or
+        (s == squares[0][1] && s == squares[1][1] && s == squares[2][1]) or
+        (s == squares[0][2] && s == squares[1][2] && s == squares[2][2]) or
+        (s == squares[0][0] && s == squares[1][1] && s == squares[2][2]) or
+        (s == squares[0][2] && s == squares[1][1] && s == squares[2][0])
+      return s
+    end
+
+    false
   end
 
   def run
