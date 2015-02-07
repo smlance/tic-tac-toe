@@ -23,8 +23,8 @@ class Pos
   attr_accessor :x, :y
 
   def initialize(xy)
-    @x = xy[0]
-    @y = xy[1]
+    @x = xy[0].to_i
+    @y = xy[1].to_i
   end
 
 end
@@ -38,11 +38,11 @@ class Board
   end
 
   def apply_move(pos, player)
-    @squares[pos.x][pos.y] = '#'
+    @squares[pos.x][pos.y] = player.symbol
   end
 
-  def valid_mode?(pos)
-    ([pos.x, pos.y] & [1, 2, 3]).present? and @squares[pos.x][pos.y] == '#'
+  def valid_move?(pos)
+    ([pos.x, pos.y] & [0, 1, 2]).any? and @squares[pos.x][pos.y] == '#'
   end
 
   def print_squares
@@ -55,13 +55,15 @@ class Board
   end
 
   def game_over?
+    result = false
     [:x, :o].each do |p|
       if p == @squares[0][0] or p == @squares[0][1] or p == @squares[0][2]
-        true
+        result = true
       else
-        false
+        result = false
       end
     end
+    result
   end
 end
 
@@ -69,19 +71,19 @@ class Game
 
   attr_accessor :board, :player_1, :player_2, :turn
 
-  def init
+  def initialize(game_type)
     @board = Board.new([['#', '#', '#'],
                         ['#', '#', '#'],
                         ['#', '#', '#']])
-    @player_1 = Player.new(:x)
-    @player_2 = Player.new(:o)
+    @player_1 = Player.new(:human, :x) # choose player_type by game_type
+    @player_2 = Player.new(:human, :o) # choose player_type by game_type
     @current = @player_1
   end
 
   def print_instructions
     puts "Tic Tac Toe"
     puts "Instructions:"
-    puts "- enter two digits between 1 and 3 (e.g., `13`), where the first is"
+    puts "- enter two digits between 0 and 2 (e.g., `12`), where the first is"
     puts "  the column and the second is the row"
     puts "- enter `q` to quit"
     puts
@@ -100,6 +102,7 @@ class Game
 
       until @board.valid_move?(move)
         puts "Invalid move; try again."
+        move = Pos.new(@current.strategy)
       end
 
       @board.apply_move(move, @current)
@@ -115,11 +118,10 @@ class Game
     elsif status == :tie
       puts "The game is a tie."
     end
-    # TODO: add option to redo the game
+    # TODO: add option to restart the game
   end
 
 end
 
-game = Game.new
-game.init
+game = Game.new(:human_vs_human)
 game.run
