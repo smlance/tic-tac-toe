@@ -1,4 +1,5 @@
-# Tic-tac-toe
+# Tic Tac Toe
+# Stefan Lance (smlance)
 
 class Player
 
@@ -11,7 +12,9 @@ class Player
 
   def strategy
     if @player_type == :human
-      return gets.chomp
+      move = gets.chomp
+      exit if move == 'q' # TODO: Add a "really?" prompt
+      return move
     # elsif @player_type == :computer
     #   return
     end
@@ -65,7 +68,7 @@ end
 
 class Game
 
-  attr_accessor :board, :player_1, :player_2, :turn
+  attr_accessor :board, :player_1, :player_2, :current
 
   def initialize(game_type)
     @board = Board.new([['#', '#', '#'],
@@ -114,10 +117,8 @@ class Game
     print_instructions
     @board.print_squares
 
-    until @board.game_over?
+    until game_over?
       move = Pos.new(@current.strategy)
-
-      return if move == 'q'
 
       until @board.valid_move?(move)
         puts "Invalid move; try again."
@@ -130,7 +131,7 @@ class Game
       puts "It's player #{@current.symbol}'s turn:"
     end
 
-    status = @board.game_over?
+    status = game_over?
 
     if status == :x or status == :o
       puts "Player #{status} won!"
