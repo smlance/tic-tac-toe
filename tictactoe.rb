@@ -36,18 +36,42 @@ end
 
 class Game
 
-  attr_accessor :board, :player_1, :player_2
+  attr_accessor :board, :player_1, :player_2, :turn
 
   def init
     @board = Board.new([['#', '#', '#'],
-                       ['#', '#', '#'],
-                       ['#', '#', '#']])
-    @board # Is this needed?
+                        ['#', '#', '#'],
+                        ['#', '#', '#']])
+    @player_1 = Player.new(:x)
+    @player_2 = Player.new(:o)
+    @turn = :x
+  end
+
+  def print_instructions
+    puts "Tic Tac Toe"
+    puts "Instructions:"
+    puts "- enter two digits between 1 and 3 (e.g., `13`), where the first is"
+    puts "  the column and the second is the row"
+    puts "- enter `q` to quit"
+    puts
   end
 
   def run
+    @board.print_squares
+
+
     while gets.chomp != 'q'
       @board.print_squares
+      if @board.game_over
+      end
+      # check whether game is over
+      #   if so, end game and print winnter
+      #   if not, continue
+
+      # get input from player
+      # check that move is valid
+      #   if so, apply move and continue
+      #   if not, get input from player again
     end
   end
 
